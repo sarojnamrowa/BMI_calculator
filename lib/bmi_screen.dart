@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:simple_app/bmiservices.dart';
+import 'package:simple_app/result_bmi.dart';
 
 import 'service_bmi.dart';
 
@@ -13,12 +15,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int height = 150;
+  //int height = 150;
   final Color highlighted = Color(0xff120d11);
   final Color unhighlighted = Color(0xff251c23);
   Gender? selectedGender;
-  int weight = 50;
-  int age = 17;
+  //int weight = 50;
+  int age = 20;
+  Services bmiService = Services();
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +94,7 @@ class _MainScreenState extends State<MainScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '$height',
+                        '${bmiService.height}',
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                       Text(
@@ -101,12 +104,12 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                   Slider(
-                    value: height.toDouble(),
+                    value: bmiService.height.toDouble(),
                     min: 80,
                     max: 220,
                     onChanged: (double newValue) {
                       setState(() {
-                        height = newValue.round();
+                        bmiService.height = newValue.roundToDouble();
                       });
                     },
                   ),
@@ -136,7 +139,7 @@ class _MainScreenState extends State<MainScreen> {
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           Text(
-                            '$weight',
+                            '${bmiService.weight}',
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           Row(
@@ -147,7 +150,7 @@ class _MainScreenState extends State<MainScreen> {
                                 child: IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      weight--;
+                                      bmiService.weight--;
                                     });
                                   },
                                   icon: Icon(Icons.remove, color: Colors.white),
@@ -158,7 +161,7 @@ class _MainScreenState extends State<MainScreen> {
                                 child: IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      weight++;
+                                      bmiService.weight++;
                                     });
                                   },
                                   icon: Icon(Icons.add, color: Colors.white),
@@ -188,7 +191,7 @@ class _MainScreenState extends State<MainScreen> {
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           Text(
-                            '$age',
+                            '${bmiService.age}',
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           Row(
@@ -199,7 +202,7 @@ class _MainScreenState extends State<MainScreen> {
                                 child: IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      age--;
+                                      bmiService.age--;
                                     });
                                   },
                                   icon: Icon(Icons.remove, color: Colors.white),
@@ -210,7 +213,7 @@ class _MainScreenState extends State<MainScreen> {
                                 child: IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      age++;
+                                      bmiService.age++;
                                     });
                                   },
                                   icon: Icon(Icons.add, color: Colors.white),
@@ -230,11 +233,39 @@ class _MainScreenState extends State<MainScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {},
-                child: Center(child: Text('CALCULATE')),
+                onPressed: () {
+                  double bmi = bmiService.bmiCalculate(
+                    bmiService.height,
+                    bmiService.weight,
+                  );
+                  String category = bmiService.getCategory(bmi);
+                  String advice = bmiService.getBmiAdvice(bmi);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResultScreen(
+                        bmiValue: bmi,
+                        advice: advice,
+                        catogory: category,
+                        age: bmiService.age,
+                      ),
+                    ),
+                  );
+                },
+                child: Center(
+                  child: Text(
+                    'CALCULATE',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

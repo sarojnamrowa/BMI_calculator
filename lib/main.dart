@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_app/Weather/weather_screen.dart';
 
 import 'bmi_screen.dart';
 
@@ -16,6 +17,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: MainScreen());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: WeatherScreen(),
+    );
   }
 }

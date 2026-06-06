@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_app/Weather/weather_screen.dart';
 
-import 'bmi_screen.dart';
+import 'BMI Calculator/bmi_screen.dart';
 
 void main() {
   runApp(MyApp());

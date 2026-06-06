@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:simple_app/bmiservices.dart';
-import 'package:simple_app/result_bmi.dart';
+import 'package:simple_app/BMI%20Calculator/bmiservices.dart';
+import 'package:simple_app/BMI%20Calculator/result_bmi.dart';
 
 import 'service_bmi.dart';
 

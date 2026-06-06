@@ -1,6 +1,6 @@
 //import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:simple_app/bmiservices.dart';
+import 'package:simple_app/BMI%20Calculator/bmiservices.dart';
 
 // ignore: must_be_immutable
 class ResultScreen extends StatelessWidget {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:simple_app/Weather/service_weather.dart';
 
 class WeatherScreen extends StatefulWidget {
@@ -12,107 +13,139 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
   //bool isLoading = false; // ✅ shows loading indicator
 
-  Future<Position> getLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return Future.error("Location Not enabled");
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error("Location permission denied");
-      }
-    }
-    return await Geolocator.getCurrentPosition();
-  }
-
   ApiWeather apiWeather = ApiWeather();
+
   ModelApi? data;
   double? temp;
   double? humidity;
   String? country;
   String? name;
+  double? wind;
+  String? situation;
+  int? cod;
+  DateTime currentDate = DateTime.now();
+  String weatherImage = '☁︎';
+
+  TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.cyan,
+      backgroundColor: Color(0xff080b30),
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xff080b30),
         title: Text("Weather Screen", style: TextStyle(color: Colors.white60)),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Position position = await getLocation();
+          Position position = await apiWeather.getLocation();
 
           double lat = position.latitude;
           double lon = position.longitude;
           data = await apiWeather.getData(lat, lon);
-          setState(() {});
-          print('Lat: ${position.latitude}');
-          print('Lon: ${position.longitude}');
+          setState(() {
+            weatherImage = apiWeather.checkWeather(data?.cod ?? 200);
+          });
+          print('$lat');
+          print(lon);
+
+          // dynamic data1 = apiWeather.getCountry(name!);
+          print(data?.name);
         },
         child: Icon(Icons.place),
       ),
-      body: Center(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          margin: EdgeInsets.all(6),
-          height: MediaQuery.of(context).size.height * 0.5,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              colors: [
-                Colors.red,
-                Colors.white,
-                Colors.grey,
-                Colors.purple,
-                Colors.green,
-              ],
+      body: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.all(5),
+            child: TextFormField(
+              style: TextStyle(color: Colors.white),
+              controller: controller,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                labelText: 'Search',
+                labelStyle: TextStyle(color: Colors.white),
+                suffixIcon: IconButton(
+                  onPressed: () async {
+                    String name = controller.text;
+                    data = await apiWeather.getCountry(name);
+                    setState(() {
+                      weatherImage = apiWeather.checkWeather(data?.cod ?? 200);
+                    });
+                    print(data?.name);
+                  },
+                  icon: Icon(Icons.search, color: Colors.white),
+                ),
+              ),
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Text(weatherImage, style: TextStyle(fontSize: 180)),
+          Text('${data?.temp ?? 0.0}°', style: TextStyle(color: Colors.white)),
+          Text(
+            DateFormat.yMMMMEEEEd().format(currentDate),
+            style: TextStyle(color: Colors.white),
+          ),
+          Row(
             children: [
-              Text(
-                'Temperature is ${data?.temp ?? 0.0}',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              RowWidgets(
+                name: 'Weather',
+                image: '☁︎',
+                num: '${data?.situation ?? ''}',
               ),
-              Text(
-                'Country = ${data?.country ?? ''}',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              RowWidgets(
+                name: 'Wind',
+                image: '💨',
+                num: '${data?.wind ?? 0.0}Km/h',
               ),
-              Text(
-                'Name of place : ${data?.name ?? ''}',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                'Humidity : ${data?.humidity ?? 0.0} ',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              RowWidgets(
+                name: 'Humidity',
+                image: '💧',
+                num: '${data?.humidity ?? 0.0}%',
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class RowWidgets extends StatelessWidget {
+  const RowWidgets({
+    super.key,
+    required this.name,
+    required this.image,
+    required this.num,
+  });
+
+  final String name;
+  final String image;
+  final String num;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Color(0xff1b1e48),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Text(image, style: TextStyle(color: Colors.white, fontSize: 50)),
+            Text(
+              name,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(num, style: TextStyle(color: Colors.white, fontSize: 14)),
+          ],
         ),
       ),
     );
